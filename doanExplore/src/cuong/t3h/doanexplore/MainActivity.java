@@ -7,7 +7,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-
+//ko dùng acitivity.
 public class MainActivity extends Activity implements OnListerne{
 
 	@Override
