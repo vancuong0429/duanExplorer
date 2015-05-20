@@ -5,17 +5,16 @@ import java.io.File;
 import cuong.t3h.doanexplore.FragmentTab.OnListerne;
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.v4.app.FragmentActivity;
 
-public class MainActivity extends Activity implements OnListerne{
+public class MainActivity extends FragmentActivity implements OnListerne{
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		FragmentTab tab = new FragmentTab();
-		getFragmentManager().beginTransaction().add(R.id.frmContent, tab).addToBackStack("null").commit();
+		getSupportFragmentManager().beginTransaction().add(R.id.frmContent, tab).addToBackStack("null").commit();
 	}
 
 	
@@ -31,7 +30,7 @@ public class MainActivity extends Activity implements OnListerne{
 			bundle.putSerializable(FragmentTab.TAG_POSITION, file);
 			FragmentOpenFiles fragmentOpenFiles = new FragmentOpenFiles();
 			fragmentOpenFiles.setArguments(bundle);
-			getFragmentManager().beginTransaction().replace(R.id.frmContent, fragmentOpenFiles).addToBackStack("null").commit();
+			getSupportFragmentManager().beginTransaction().replace(R.id.frmContent, fragmentOpenFiles).addToBackStack("null").commit();
 		}
 	}
 }

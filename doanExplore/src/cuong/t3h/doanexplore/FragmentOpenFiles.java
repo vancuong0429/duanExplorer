@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class FragmentOpenFiles extends Fragment{
+public class FragmentOpenFiles extends android.support.v4.app.Fragment{
 
 	File file=null;
 	@Override

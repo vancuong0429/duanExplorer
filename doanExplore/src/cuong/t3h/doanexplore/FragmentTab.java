@@ -16,7 +16,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TabHost;
 
-public class FragmentTab extends Fragment{
+public class FragmentTab extends android.support.v4.app.Fragment{
 	final static String TAG_POSITION="path";
 	private ArrayList<File> fileList = new ArrayList<File>();
 	MyBaseAdapter adapter;
@@ -47,29 +47,54 @@ public class FragmentTab extends Fragment{
 				return false;
 			}
 		});
+		File file = getActivity().getFilesDir().getAbsoluteFile();
+		if(file!=null)
+		{
+			loadAllFiles(file);
+			//lsv.setAdapter(adapter);
+		}
 		if(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
 		{
+			
 			File root = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
 			loadAllFiles(root);
 			adapter = new MyBaseAdapter(getActivity(), fileList, R.layout.my_baseadapter);
 			addTab();
 			lsv.setAdapter(adapter);
 		}
-		File file = getActivity().getFilesDir().getAbsoluteFile();
-		loadAllFiles(file);
-		lsv.setAdapter(adapter);
-		adapter.notifyDataSetChanged();
+	
+		
 	}
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		getActivity().finish();
+	}
+	static int dem=0;
 	public void loadAllFiles(File f)
 	{
+		
 		File []file1 = f.listFiles();
 		if(file1!=null && file1.length>0)
 		{
+			
 			Log.e("cuong", file1.toString()+"---------");
-			fileList.clear();
+			//fileList.clear();
 			for (int i=0; i<file1.length;i++) {
-				fileList.add(file1[i]);
+				if(file1[i].isDirectory())//it is folder
+				{
+					Log.e("cuong_folder", dem++ +"");
+					fileList.add(file1[i]);
+					loadAllFiles(file1[i]);
+					
+				}
+				else
+				{
+					fileList.add(file1[i]);
+				}
 			}
+			
 		}
 	}
 	@Override
@@ -82,15 +107,19 @@ public class FragmentTab extends Fragment{
 	{
 		TabHost tabHost = (TabHost) getActivity().findViewById(android.R.id.tabhost);
 		tabHost.setup();
-		TabHost.TabSpec tabSpec;
-		tabSpec = tabHost.newTabSpec("All Files");
-		tabSpec.setContent(R.id.tab1);
-		tabSpec.setIndicator("All Files");
-		tabHost.addTab(tabSpec);
+		TabHost.TabSpec tabSpec = null;
+		if(tabSpec==null)
+		{
+			tabSpec = tabHost.newTabSpec("All Files");
+			tabSpec.setContent(R.id.tab1);
+			tabSpec.setIndicator("All Files");
+			tabHost.addTab(tabSpec);
+			tabHost.setCurrentTab(0);
+		}
 		
 		//-----------
 		
-		tabHost.setCurrentTab(0);
+		
 		
 	}
 }
