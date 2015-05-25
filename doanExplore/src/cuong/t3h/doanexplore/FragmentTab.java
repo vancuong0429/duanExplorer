@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -13,19 +12,12 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Choreographer.FrameCallback;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckedTextView;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
-import android.widget.ExpandableListView.OnChildClickListener;
-import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.TextView;
 
 public class FragmentTab extends Fragment{
 	final static String TAG_POSITION="path";
@@ -92,13 +84,11 @@ public class FragmentTab extends Fragment{
 				{
 					child.add(file1[i]);
 					Log.e("cuong_folder", dem++ +"");
-					
-					
 				}
-				
-			}	
+			}
 			childItems.add(child);
-			child   = new ArrayList<File>();
+			child = new ArrayList<>();
+			
 		}
 	}
 	@Override
@@ -131,10 +121,10 @@ public class FragmentTab extends Fragment{
 	    ArrayList<File> parentItems;
 		private ArrayList<File> child;
 	
-	public ExpandableListAdapter(ArrayList<File> parentItems2, ArrayList<Object> childern)
+	public ExpandableListAdapter(ArrayList<File> parentItems2, ArrayList<Object> childItems)
 	{
 	    this.parentItems = parentItems2;
-	    this.childtems = childern;
+	    this.childtems = childItems;
 	}
 	
 	public void setInflater(LayoutInflater inflater, FragmentTab hmCfragment) 
@@ -147,6 +137,7 @@ public class FragmentTab extends Fragment{
 	    return parentItems.size();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public int getChildrenCount(int groupPosition) {
 	    return childtems.size();
@@ -201,19 +192,24 @@ public class FragmentTab extends Fragment{
 	      if (convertView == null) {
 	          convertView = inflater.inflate(R.layout.child_layout, null);
 	      }
+	      /*textView.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				File f = new File(child.get(childPosition));
+				listerne.onLongClick(f);
+			}
+		});
+*/	       // get the textView reference and set the value
 	      
-	       // get the textView reference and set the value
+	      Log.e("chile", child.size() + "----" +childPosition);
 	      textView = (TextView) convertView.findViewById(R.id.textViewChild);
-	      textView.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					listerne.onLongClick(child.get(childPosition));
-				}
-			});
-	      textView.setText(child.get(childPosition).getName());
-	        return convertView;
+	      if(child.size()>childPosition)
+	      {
+	    	  textView.setText(child.get(childPosition).getName());
+	      }
+	      return convertView;
 	}
 	
 	@Override

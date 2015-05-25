@@ -9,6 +9,7 @@ import android.app.Fragment;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,12 @@ public class FragmentOpenFiles extends android.support.v4.app.Fragment{
 		Bundle bundle = getArguments();
 		file=(File) bundle.getSerializable(FragmentTab.TAG_POSITION);
 		return inflater.inflate(R.layout.layout_tap_open_files, container, false);
+	}
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		Log.e("pause", "pause");
 	}
 	@Override
 	public void onResume() {
@@ -67,10 +74,5 @@ public class FragmentOpenFiles extends android.support.v4.app.Fragment{
 			ImageView imageView =(ImageView) getActivity().findViewById(R.id.imgFile);
 			imageView.setImageURI(Uri.parse(file.getPath()));
 		}
-		
-		
-	
-	}
-	
-		
+	}		
 }
