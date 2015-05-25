@@ -27,9 +27,9 @@ public class FragmentOpenFiles extends android.support.v4.app.Fragment{
 		return inflater.inflate(R.layout.layout_tap_open_files, container, false);
 	}
 	@Override
-	public void onStart() {
+	public void onResume() {
 		// TODO Auto-generated method stub
-		super.onStart();
+		super.onResume();
 		TextView txt =(TextView) getActivity().findViewById(R.id.txtFile);
 		if (file.getName().endsWith(".txt"))
 		{
@@ -69,5 +69,8 @@ public class FragmentOpenFiles extends android.support.v4.app.Fragment{
 		}
 		
 		
+	
 	}
+	
+		
 }

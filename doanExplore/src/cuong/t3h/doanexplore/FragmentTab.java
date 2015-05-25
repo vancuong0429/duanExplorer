@@ -4,22 +4,35 @@ import java.io.File;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.content.Context;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Choreographer.FrameCallback;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.CheckedTextView;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.TextView;
+import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ListView;
 import android.widget.TabHost;
 
-public class FragmentTab extends android.support.v4.app.Fragment{
+public class FragmentTab extends Fragment{
 	final static String TAG_POSITION="path";
-	private ArrayList<File> fileList = new ArrayList<File>();
-	MyBaseAdapter adapter;
+	private ArrayList<File> parentItems = new ArrayList<File>();
+    private ArrayList<Object> childItems = new ArrayList<Object>();
+    View rootView;
+    ExpandableListView elv;
 	OnListerne listerne;
 	interface OnListerne
 	{
@@ -31,22 +44,10 @@ public class FragmentTab extends android.support.v4.app.Fragment{
 		// TODO Auto-generated method stub
 		return inflater.inflate(R.layout.fragment_tab, container, false);
 	}
-	
 	@Override
-	public void onStart() {
+	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		super.onStart();
-		ListView lsv = (ListView) getActivity().findViewById(R.id.lsvAllApp);
-		lsv.setOnItemLongClickListener(new OnItemLongClickListener() {
-
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				// TODO Auto-generated method stub
-				listerne.onLongClick(fileList.get(position));
-				return false;
-			}
-		});
+		super.onViewCreated(view, savedInstanceState);
 		File file = getActivity().getFilesDir().getAbsoluteFile();
 		if(file!=null)
 		{
@@ -58,12 +59,15 @@ public class FragmentTab extends android.support.v4.app.Fragment{
 			
 			File root = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
 			loadAllFiles(root);
-			adapter = new MyBaseAdapter(getActivity(), fileList, R.layout.my_baseadapter);
 			addTab();
-			lsv.setAdapter(adapter);
 		}
-	
+		elv=(ExpandableListView) view.findViewById(R.id.expandableListView1);
+		ExpandableListAdapter adapter = new ExpandableListAdapter(parentItems, childItems);
 		
+		adapter.setInflater((LayoutInflater)      getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE), this);
+		
+		// Set the Adapter to expandableList
+		elv.setAdapter(adapter);
 	}
 	@Override
 	public void onPause() {
@@ -74,27 +78,27 @@ public class FragmentTab extends android.support.v4.app.Fragment{
 	static int dem=0;
 	public void loadAllFiles(File f)
 	{
-		
+		ArrayList<File> child = new ArrayList<File>();
 		File []file1 = f.listFiles();
 		if(file1!=null && file1.length>0)
 		{
-			
-			Log.e("cuong", file1.toString()+"---------");
-			//fileList.clear();
 			for (int i=0; i<file1.length;i++) {
 				if(file1[i].isDirectory())//it is folder
 				{
-					Log.e("cuong_folder", dem++ +"");
-					fileList.add(file1[i]);
+					parentItems.add(file1[i]);
 					loadAllFiles(file1[i]);
-					
 				}
 				else
 				{
-					fileList.add(file1[i]);
+					child.add(file1[i]);
+					Log.e("cuong_folder", dem++ +"");
+					
+					
 				}
-			}
-			
+				
+			}	
+			childItems.add(child);
+			child   = new ArrayList<File>();
 		}
 	}
 	@Override
@@ -119,7 +123,118 @@ public class FragmentTab extends android.support.v4.app.Fragment{
 		
 		//-----------
 		
-		
-		
 	}
+	public class ExpandableListAdapter extends BaseExpandableListAdapter {
+		
+	    private ArrayList<Object> childtems;
+	    private LayoutInflater inflater;
+	    ArrayList<File> parentItems;
+		private ArrayList<File> child;
+	
+	public ExpandableListAdapter(ArrayList<File> parentItems2, ArrayList<Object> childern)
+	{
+	    this.parentItems = parentItems2;
+	    this.childtems = childern;
+	}
+	
+	public void setInflater(LayoutInflater inflater, FragmentTab hmCfragment) 
+	{
+	    this.inflater = inflater;
+	}
+	
+	@Override
+	public int getGroupCount() {
+	    return parentItems.size();
+	}
+	
+	@Override
+	public int getChildrenCount(int groupPosition) {
+	    return childtems.size();
+	}
+	
+	@Override
+	public void onGroupCollapsed(int groupPosition) 
+	{
+	    super.onGroupCollapsed(groupPosition);
+	}
+	
+	@Override
+	public void onGroupExpanded(int groupPosition)
+	{
+	    super.onGroupExpanded(groupPosition);
+	}
+	
+	
+	@Override
+	public String getGroup(int groupPosition) {
+	    return null;
+	}
+	
+	@Override
+	public String getChild(int groupPosition, int childPosition) {
+	    return null;
+	}
+	
+	@Override
+	public long getGroupId(int groupPosition) {
+	    return 0;
+	}
+	
+	@Override
+	public long getChildId(int groupPosition, int childPosition) {
+	    return 0;
+	}
+	
+	@Override
+	public boolean hasStableIds() {
+	    return false;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View    convertView, ViewGroup parent) {
+	
+	      child = (ArrayList<File>) childtems.get(groupPosition);
+	
+	      TextView textView = null;
+	
+	      if (convertView == null) {
+	          convertView = inflater.inflate(R.layout.child_layout, null);
+	      }
+	      
+	       // get the textView reference and set the value
+	      textView = (TextView) convertView.findViewById(R.id.textViewChild);
+	      textView.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					listerne.onLongClick(child.get(childPosition));
+				}
+			});
+	      textView.setText(child.get(childPosition).getName());
+	        return convertView;
+	}
+	
+	@Override
+	public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+	    if (convertView == null) {
+	        convertView = inflater.inflate(R.layout.parent_layout, null);
+	    }
+	
+	    ((CheckedTextView) convertView).setText(parentItems.get(groupPosition).getName());
+	    ((CheckedTextView) convertView).setChecked(isExpanded);
+	    return convertView;
+	}
+	
+	@Override
+	public boolean isChildSelectable(int groupPosition, int childPosition) {
+	    return false;
+	}
+	class ViewHolder {
+	    TextView text;
+	
+	 }
+ }
+
 }
